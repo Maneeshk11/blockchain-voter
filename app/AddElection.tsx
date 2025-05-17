@@ -12,7 +12,7 @@ import {
   Dialog,
 } from "@/components/ui/dialog";
 import { Plus, Trash } from "lucide-react";
-import { useWriteContract } from "wagmi";
+import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { VOTING_CONTRACT_ABI, VOTING_CONTRACT_ADDRESS } from "@/lib/constants";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -34,7 +34,18 @@ const ElectionSchema = z.object({
 });
 
 const AddElection = () => {
-  const { writeContract, isPending, error, reset } = useWriteContract();
+  const {
+    writeContract,
+    isPending,
+    error,
+    reset,
+    data: hash,
+  } = useWriteContract();
+
+  const { isSuccess, isLoading, isError } = useWaitForTransactionReceipt({
+    hash,
+    chainId: 11155111,
+  });
 
   useEffect(() => {
     const loadingToastId = "creating-election";
@@ -52,6 +63,29 @@ const AddElection = () => {
       }
     }
   }, [isPending, error, reset]);
+
+  useEffect(() => {
+    const loadingToastId = "creating-election-blockchain";
+    if (isLoading) {
+      toast.loading("Creating election in blockchain...", {
+        id: loadingToastId,
+      });
+    } else {
+      toast.dismiss(loadingToastId);
+    }
+
+    if (isSuccess) {
+      toast.success("Election created successfully", {
+        duration: 6000,
+      });
+    }
+
+    if (isError) {
+      toast.error("Failed to create election in blockchain", {
+        duration: 6000,
+      });
+    }
+  }, [isSuccess, isLoading, isError]);
 
   const form = useForm<z.infer<typeof ElectionSchema>>({
     resolver: zodResolver(ElectionSchema),
@@ -104,7 +138,12 @@ const AddElection = () => {
                   <FormItem>
                     <FormLabel>Election Name</FormLabel>
                     <FormControl>
-                      <Input type="text" placeholder="Name" {...field} />
+                      <Input
+                        type="text"
+                        placeholder="Election Name"
+                        className="placeholder:text-gray-400"
+                        {...field}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
@@ -120,6 +159,7 @@ const AddElection = () => {
                       <Input
                         type="text"
                         placeholder="Election Description"
+                        className="placeholder:text-gray-400"
                         {...field}
                       />
                     </FormControl>
@@ -134,6 +174,7 @@ const AddElection = () => {
                   </span>
                   <Button
                     variant="outline"
+                    type="button"
                     size="icon"
                     onClick={() => {
                       form.setValue("proposals", [
@@ -156,6 +197,7 @@ const AddElection = () => {
                           <Input
                             type="text"
                             placeholder="Proposal"
+                            className="placeholder:text-gray-400"
                             value={proposal}
                             onChange={(e) => {
                               const newProposals = [...field.value];

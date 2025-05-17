@@ -8,6 +8,7 @@ import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { ElectionData, FormattedElection } from "@/lib/utils/types";
 import formatElections from "@/lib/utils/election";
+import { Loader2 } from "lucide-react";
 
 const Elections = () => {
   const {
@@ -22,7 +23,12 @@ const Elections = () => {
   });
 
   if (isLoading) {
-    return <div>Loading elections...</div>;
+    return (
+      <div className="flex items-center justify-center gap-2 py-10">
+        <span>Loading elections</span>
+        <Loader2 className="animate-spin" />
+      </div>
+    );
   }
 
   if (error) {

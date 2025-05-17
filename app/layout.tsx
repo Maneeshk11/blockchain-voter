@@ -6,6 +6,7 @@ import { getConfig } from "@/configs/wagmi";
 import { headers } from "next/headers";
 import { type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -25,6 +26,7 @@ export default async function RootLayout(props: { children: ReactNode }) {
           <Providers initialState={initialState}>
             {props.children}
             <Toaster />
+            <Analytics />
           </Providers>
         </div>
       </body>
