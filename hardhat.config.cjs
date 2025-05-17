@@ -5,7 +5,12 @@ require("dotenv").config();
 require("@nomicfoundation/hardhat-ethers");
 
 module.exports = {
-  solidity: "0.8.28",
+  solidity: {
+    version: "0.8.28",
+    settings: {
+      viaIR: true,
+    }
+  },
   networks: {
     sepolia: {
       url: process.env.SEPOLIA_RPC_URL,

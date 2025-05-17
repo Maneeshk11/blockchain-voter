@@ -23,7 +23,7 @@ async function main() {
   // Verify the contract deployed correctly by calling getProposals
   try {
     console.log("Verifying contract by calling getProposals...");
-    const proposals = await voting.getProposals();
+    const proposals = await voting.getElections();
     console.log("Retrieved proposals successfully:");
     console.log(proposals);
   } catch (error) {
