@@ -5,6 +5,7 @@ import { cookieToInitialState } from "wagmi";
 import { getConfig } from "@/configs/wagmi";
 import { headers } from "next/headers";
 import { type ReactNode } from "react";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -21,7 +22,10 @@ export default async function RootLayout(props: { children: ReactNode }) {
     <html lang="en">
       <body className={`antialiased`}>
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 border-x-[1px] border-primary border-dashed h-screen">
-          <Providers initialState={initialState}>{props.children}</Providers>
+          <Providers initialState={initialState}>
+            {props.children}
+            <Toaster />
+          </Providers>
         </div>
       </body>
     </html>

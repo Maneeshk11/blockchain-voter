@@ -52,7 +52,11 @@ const Nav = () => {
             {connectors.map((connector) => (
               <DropdownMenuItem
                 key={connector.id}
-                onClick={() => connector.connect()}
+                onClick={() =>
+                  connector.connect({
+                    chainId: 11155111,
+                  })
+                }
               >
                 <span>{connector.icon}</span>
                 {connector.name}
