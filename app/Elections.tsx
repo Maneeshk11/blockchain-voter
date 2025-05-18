@@ -9,18 +9,30 @@ import { Separator } from "@/components/ui/separator";
 import { ElectionData, FormattedElection } from "@/lib/utils/types";
 import formatElections from "@/lib/utils/election";
 import { Loader2 } from "lucide-react";
+import { useElectionContext } from "./ElectionContextProvider";
+import { useEffect } from "react";
 
 const Elections = () => {
+  const { refresh, setRefresh } = useElectionContext();
+
   const {
     data: electionsData,
     error,
     isLoading,
+    refetch,
   } = useReadContract({
     address: VOTING_CONTRACT_ADDRESS,
     abi: VOTING_CONTRACT_ABI,
     functionName: "getElections",
     chainId: 11155111,
   });
+
+  useEffect(() => {
+    if (refresh) {
+      refetch();
+      setRefresh(false);
+    }
+  }, [refresh, refetch, setRefresh]);
 
   if (isLoading) {
     return (

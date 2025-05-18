@@ -25,7 +25,8 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { toast } from "sonner";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useElectionContext } from "./ElectionContextProvider";
 
 const ElectionSchema = z.object({
   name: z.string().min(1),
@@ -34,12 +35,17 @@ const ElectionSchema = z.object({
 });
 
 const AddElection = () => {
+  const [open, setOpen] = useState(false);
+
+  const { setRefresh } = useElectionContext();
+
   const {
     writeContract,
     isPending,
     error,
     reset,
     data: hash,
+    isSuccess: isSuccessWrite,
   } = useWriteContract();
 
   const { isSuccess, isLoading, isError } = useWaitForTransactionReceipt({
@@ -50,19 +56,21 @@ const AddElection = () => {
   useEffect(() => {
     const loadingToastId = "creating-election";
     if (isPending) {
-      toast.loading("Creating election...", { id: loadingToastId });
+      toast.loading("Initiating election creation ...", { id: loadingToastId });
     } else {
       toast.dismiss(loadingToastId);
       if (error) {
         toast.error(
-          `Failed to create election: ${
+          `Failed to initiate election creation: ${
             error instanceof Error ? error.message : String(error)
           }`,
           { duration: 6000 }
         );
+      } else if (isSuccessWrite) {
+        setOpen(false);
       }
     }
-  }, [isPending, error, reset]);
+  }, [isPending, error, reset, isSuccessWrite]);
 
   useEffect(() => {
     const loadingToastId = "creating-election-blockchain";
@@ -78,6 +86,7 @@ const AddElection = () => {
       toast.success("Election created successfully", {
         duration: 6000,
       });
+      setRefresh(true);
     }
 
     if (isError) {
@@ -85,7 +94,7 @@ const AddElection = () => {
         duration: 6000,
       });
     }
-  }, [isSuccess, isLoading, isError]);
+  }, [isSuccess, isLoading, isError, setRefresh]);
 
   const form = useForm<z.infer<typeof ElectionSchema>>({
     resolver: zodResolver(ElectionSchema),
@@ -108,13 +117,18 @@ const AddElection = () => {
 
   return (
     <Dialog
+      open={open}
       onOpenChange={() => {
         reset();
         form.reset();
       }}
     >
       <DialogTrigger asChild>
-        <Button className="cursor-pointer" variant="outline">
+        <Button
+          onClick={() => setOpen(true)}
+          className="cursor-pointer"
+          variant="outline"
+        >
           <Plus />
           Add Election
         </Button>

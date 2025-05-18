@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import Elections from "./Elections";
 import AddElection from "./AddElection";
+import { ElectionContextProvider } from "./ElectionContextProvider";
 
 export default function Home() {
   return (
@@ -12,13 +13,15 @@ export default function Home() {
         <Input type="search" placeholder="Search for elections" />
       </div>
 
-      <div className="flex flex-col gap-2">
-        <div className="flex justify-between items-center gap-2">
-          <span className="text-lg font-medium">Elections</span>
-          <AddElection />
+      <ElectionContextProvider>
+        <div className="flex flex-col gap-2">
+          <div className="flex justify-between items-center gap-2">
+            <span className="text-lg font-medium">Elections</span>
+            <AddElection />
+          </div>
+          <Elections />
         </div>
-        <Elections />
-      </div>
+      </ElectionContextProvider>
     </div>
   );
 }
