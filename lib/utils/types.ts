@@ -9,7 +9,8 @@ export type ElectionData = [
   bigint, // id
   string, // name
   string, // description
-  Proposal[] // proposals
+  Proposal[], // proposals
+  boolean // voted
 ];
 
 export type FormattedElection = {
@@ -18,6 +19,7 @@ export type FormattedElection = {
   description: string;
   proposalCount?: number;
   proposals?: Proposal[];
+  voted: boolean;
 };
 
 export type Proposal = {

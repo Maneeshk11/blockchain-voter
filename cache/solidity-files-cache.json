@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/maneeshkolli/Desktop/projs/voting_systtem/contracts/voting.sol": {
-      "lastModificationDate": 1747545870412,
-      "contentHash": "74e22e4c974143f5e089dea91cff19b1",
+      "lastModificationDate": 1747686168498,
+      "contentHash": "fdb8f255107f8c42f874737d08f7333a",
       "sourceName": "contracts/voting.sol",
       "solcConfig": {
         "version": "0.8.28",

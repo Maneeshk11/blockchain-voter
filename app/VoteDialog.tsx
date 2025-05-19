@@ -66,7 +66,9 @@ const VoteDialog: FC<VoteDialogProps> = ({ open, onOpenChange }) => {
 
   const formattedElection = election
     ? formatElection(election as ElectionData)
-    : { name: "", description: "", proposals: [] };
+    : { name: "", description: "", proposals: [], voted: false };
+
+  console.log(formattedElection);
 
   return (
     <div>
@@ -101,6 +103,7 @@ const VoteDialog: FC<VoteDialogProps> = ({ open, onOpenChange }) => {
                             <RadioGroup
                               onValueChange={field.onChange}
                               defaultValue={field.value}
+                              disabled={formattedElection.voted}
                             >
                               {formattedElection.proposals?.map((proposal) => (
                                 <div
@@ -127,7 +130,17 @@ const VoteDialog: FC<VoteDialogProps> = ({ open, onOpenChange }) => {
                         </FormItem>
                       )}
                     />
-                    <Button type="submit">Vote</Button>
+                    <Button
+                      type="submit"
+                      disabled={formattedElection.voted}
+                      className={`${
+                        formattedElection.voted
+                          ? "bg-gray-500 cursor-not-allowed"
+                          : "cursor-pointer"
+                      }`}
+                    >
+                      {formattedElection.voted ? "Already Voted" : "Vote"}
+                    </Button>
                   </form>
                 </Form>
               </div>
