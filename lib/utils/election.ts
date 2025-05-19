@@ -1,6 +1,6 @@
-import { ElectionData, FormattedElection } from "./types";
+import { ElectionData, ElectionsData, FormattedElection } from "./types";
 
-const formatElections = (elections: ElectionData): FormattedElection[] => {
+const formatElections = (elections: ElectionsData): FormattedElection[] => {
   const typedElections = elections
     ? {
         ids: elections[0] || [],
@@ -23,4 +23,18 @@ const formatElections = (elections: ElectionData): FormattedElection[] => {
   return formattedElections;
 };
 
-export default formatElections;
+const formatElection = (election: ElectionData): FormattedElection => {
+  return {
+    id: Number(election[0]),
+    name: election[1],
+    description: election[2],
+    proposals: election[3].map((proposal) => ({
+      id: Number(proposal.id),
+      name: proposal.name,
+      votecount: Number(proposal.votecount),
+    })),
+    proposalCount: Number(election[3].length),
+  };
+};
+
+export { formatElections, formatElection };

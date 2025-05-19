@@ -3,7 +3,8 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import Elections from "./Elections";
 import AddElection from "./AddElection";
-import { ElectionContextProvider } from "./ElectionContextProvider";
+import { ElectionContextProvider } from "@/lib/contexts/ElectionContextProvider";
+import { VoteContextProvider } from "@/lib/contexts/VoteContextProvider";
 
 export default function Home() {
   return (
@@ -19,7 +20,9 @@ export default function Home() {
             <span className="text-lg font-medium">Elections</span>
             <AddElection />
           </div>
-          <Elections />
+          <VoteContextProvider>
+            <Elections />
+          </VoteContextProvider>
         </div>
       </ElectionContextProvider>
     </div>

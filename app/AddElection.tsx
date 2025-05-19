@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/form";
 import { toast } from "sonner";
 import { useEffect, useState } from "react";
-import { useElectionContext } from "./ElectionContextProvider";
+import { useElectionContext } from "../lib/contexts/ElectionContextProvider";
 
 const ElectionSchema = z.object({
   name: z.string().min(1),

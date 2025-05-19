@@ -98,7 +98,7 @@ contract Voting {
             uint256 id,
             string memory name,
             string memory description,
-            uint256 proposalCount
+            Proposal[] memory proposals
         )
     {
         require(electionId < elections.length, "Invalid election ID");
@@ -107,7 +107,7 @@ contract Voting {
             election.id,
             election.name,
             election.description,
-            election.proposals.length
+            election.proposals
         );
     }
 

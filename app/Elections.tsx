@@ -3,17 +3,19 @@
 import { VOTING_CONTRACT_ABI, VOTING_CONTRACT_ADDRESS } from "@/lib/constants";
 import { useReadContract } from "wagmi";
 
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
-import { ElectionData, FormattedElection } from "@/lib/utils/types";
-import formatElections from "@/lib/utils/election";
+import { ElectionsData, FormattedElection } from "@/lib/utils/types";
+import { formatElections } from "@/lib/utils/election";
 import { Loader2 } from "lucide-react";
-import { useElectionContext } from "./ElectionContextProvider";
-import { useEffect } from "react";
-
+import { useElectionContext } from "../lib/contexts/ElectionContextProvider";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import VoteDialog from "./VoteDialog";
+import { useVoteContext } from "@/lib/contexts/VoteContextProvider";
 const Elections = () => {
   const { refresh, setRefresh } = useElectionContext();
+  const { setElectionId } = useVoteContext();
+  const [electionDialogOpen, setElectionDialogOpen] = useState<boolean>(false);
 
   const {
     data: electionsData,
@@ -48,7 +50,7 @@ const Elections = () => {
     return <div>Error loading elections: {error.message}</div>;
   }
 
-  const formattedElections = formatElections(electionsData as ElectionData);
+  const formattedElections = formatElections(electionsData as ElectionsData);
 
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -65,10 +67,15 @@ const Elections = () => {
                   Proposals: {election.proposalCount}
                 </span>
               </div>
-
-              <Link href={`/elections/${election.id}`}>
-                <Button className="cursor-pointer">View & Vote</Button>
-              </Link>
+              <Button
+                className="cursor-pointer"
+                onClick={() => {
+                  setElectionId(election.id);
+                  setElectionDialogOpen(true);
+                }}
+              >
+                Vote
+              </Button>
             </div>
             <Separator />
             <span className="text-sm text-gray-600 line-clamp-2">
@@ -79,6 +86,10 @@ const Elections = () => {
       ) : (
         <div className="p-4 border rounded text-center">No elections found</div>
       )}
+      <VoteDialog
+        open={electionDialogOpen}
+        onOpenChange={setElectionDialogOpen}
+      />
     </div>
   );
 };
