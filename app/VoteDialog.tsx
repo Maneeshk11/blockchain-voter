@@ -6,8 +6,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { VOTING_CONTRACT_ABI, VOTING_CONTRACT_ADDRESS } from "@/lib/constants";
-import { FC } from "react";
+import {
+  VOTING_CHAIN_ID,
+  VOTING_CONTRACT_ABI,
+  VOTING_CONTRACT_ADDRESS,
+} from "@/lib/constants";
+import { FC, useEffect } from "react";
 import { useReadContract } from "wagmi";
 import { useVoteContext } from "@/lib/contexts/VoteContextProvider";
 import { formatElection } from "@/lib/utils/election";
@@ -26,6 +30,7 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { useWriteContract } from "wagmi";
+import { toast } from "sonner";
 
 const voteFormSchema = z.object({
   proposalId: z.string().min(1),
@@ -38,7 +43,8 @@ interface VoteDialogProps {
 
 const VoteDialog: FC<VoteDialogProps> = ({ open, onOpenChange }) => {
   const { electionId } = useVoteContext();
-  const { writeContract } = useWriteContract();
+  const { writeContract, isPending, isSuccess, isError, reset, error } =
+    useWriteContract();
 
   const form = useForm<z.infer<typeof voteFormSchema>>({
     resolver: zodResolver(voteFormSchema),
@@ -53,22 +59,52 @@ const VoteDialog: FC<VoteDialogProps> = ({ open, onOpenChange }) => {
       abi: VOTING_CONTRACT_ABI,
       functionName: "vote",
       args: [electionId, Number(data.proposalId)],
+      chainId: VOTING_CHAIN_ID,
     });
   };
+
+  useEffect(() => {
+    const loadingToastId = "voting";
+    if (isPending) {
+      toast.loading("Voting...", { id: loadingToastId });
+    }
+
+    if (isSuccess) {
+      toast.dismiss(loadingToastId);
+      toast.success("Vote submitted successfully");
+      reset();
+      onOpenChange(false);
+    }
+
+    if (isError) {
+      toast.dismiss(loadingToastId);
+      toast.error("Error submitting vote: " + error);
+    }
+  }, [isSuccess, isError, isPending, reset]);
 
   const { data: election, isLoading } = useReadContract({
     address: VOTING_CONTRACT_ADDRESS,
     abi: VOTING_CONTRACT_ABI,
     functionName: "getElection",
-    chainId: 11155111,
+    chainId: VOTING_CHAIN_ID,
     args: [electionId],
   });
+
+  const { data: hasVotedData } = useReadContract({
+    address: VOTING_CONTRACT_ADDRESS,
+    abi: VOTING_CONTRACT_ABI,
+    functionName: "hasAlreadyVoted",
+    chainId: VOTING_CHAIN_ID,
+    args: [electionId],
+  });
+
+  const hasVoted = hasVotedData as boolean;
+
+  console.log("hasVoted: ", hasVoted);
 
   const formattedElection = election
     ? formatElection(election as ElectionData)
     : { name: "", description: "", proposals: [], voted: false };
-
-  console.log(formattedElection);
 
   return (
     <div>
@@ -103,7 +139,7 @@ const VoteDialog: FC<VoteDialogProps> = ({ open, onOpenChange }) => {
                             <RadioGroup
                               onValueChange={field.onChange}
                               defaultValue={field.value}
-                              disabled={formattedElection.voted}
+                              disabled={hasVoted}
                             >
                               {formattedElection.proposals?.map((proposal) => (
                                 <div
@@ -132,14 +168,14 @@ const VoteDialog: FC<VoteDialogProps> = ({ open, onOpenChange }) => {
                     />
                     <Button
                       type="submit"
-                      disabled={formattedElection.voted}
+                      disabled={hasVoted}
                       className={`${
-                        formattedElection.voted
+                        hasVoted
                           ? "bg-gray-500 cursor-not-allowed"
                           : "cursor-pointer"
                       }`}
                     >
-                      {formattedElection.voted ? "Already Voted" : "Vote"}
+                      {hasVoted ? "Already Voted" : "Vote"}
                     </Button>
                   </form>
                 </Form>

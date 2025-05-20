@@ -19,7 +19,6 @@ export type FormattedElection = {
   description: string;
   proposalCount?: number;
   proposals?: Proposal[];
-  voted: boolean;
 };
 
 export type Proposal = {

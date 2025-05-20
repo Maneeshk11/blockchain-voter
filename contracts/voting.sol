@@ -89,6 +89,14 @@ contract Voting {
         return (ids, names, descriptions, proposalCounts);
     }
 
+    function hasAlreadyVoted(uint256 electionId) public view returns (bool) {
+        require(electionId < elections.length, "Invalid election ID");
+        if (hasVoted[msg.sender][electionId]) {
+            return true;
+        }
+        return false;
+    }
+
     function getElection(
         uint256 electionId
     )
