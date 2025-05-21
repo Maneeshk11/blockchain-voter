@@ -91,10 +91,7 @@ contract Voting {
 
     function hasAlreadyVoted(uint256 electionId) public view returns (bool) {
         require(electionId < elections.length, "Invalid election ID");
-        if (hasVoted[msg.sender][electionId]) {
-            return true;
-        }
-        return false;
+        return hasVoted[msg.sender][electionId];
     }
 
     function getElection(

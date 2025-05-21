@@ -12,7 +12,7 @@ import {
   VOTING_CONTRACT_ADDRESS,
 } from "@/lib/constants";
 import { FC, useEffect } from "react";
-import { useReadContract } from "wagmi";
+import { useReadContract, useAccount } from "wagmi";
 import { useVoteContext } from "@/lib/contexts/VoteContextProvider";
 import { formatElection } from "@/lib/utils/election";
 import { ElectionData } from "@/lib/utils/types";
@@ -45,6 +45,7 @@ const VoteDialog: FC<VoteDialogProps> = ({ open, onOpenChange }) => {
   const { electionId } = useVoteContext();
   const { writeContract, isPending, isSuccess, isError, reset, error } =
     useWriteContract();
+  const { address } = useAccount();
 
   const form = useForm<z.infer<typeof voteFormSchema>>({
     resolver: zodResolver(voteFormSchema),
@@ -96,6 +97,7 @@ const VoteDialog: FC<VoteDialogProps> = ({ open, onOpenChange }) => {
     functionName: "hasAlreadyVoted",
     chainId: VOTING_CHAIN_ID,
     args: [electionId],
+    account: address,
   });
 
   const hasVoted = hasVotedData as boolean;
